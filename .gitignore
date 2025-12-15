@@ -1,0 +1,13 @@
+# Python / uv
+.venv/
+uv.lock.tmp
+__pycache__/
+
+# Build artifacts
+dist/
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/

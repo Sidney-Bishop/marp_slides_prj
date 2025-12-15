@@ -1,0 +1,8 @@
+[project]
+name = "slides_project"
+version = "0.1.0"
+description = "Markdown-driven slides with Python governance"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "rich>=13.7",     # logging / diagnostics for build.py
+]

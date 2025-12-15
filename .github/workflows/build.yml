@@ -1,0 +1,62 @@
+# .github/workflows/build.yml
+
+name: 🚀 Build and Deploy Slides
+
+# This workflow runs whenever code is pushed to the 'main' branch
+on:
+  push:
+    branches:
+      - main
+  # Allows you to manually trigger the workflow from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed to push the built files back to the gh-pages branch
+      pages: write # Needed for GitHub Pages deployment
+      id-token: write # Needed for GitHub Pages deployment (OIDC)
+
+    steps:
+      # 1. Checkout the repository code
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Python environment and uv
+      - name: 🐍 Setup Python and uv
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: 🔨 Install uv
+        run: pip install uv
+
+      # 3. Setup Pandoc (Using a modern version for reliability)
+      - name: 📚 Install Pandoc (v3.1.9)
+        uses: r-lib/actions/setup-pandoc@v2
+        with:
+          # Standardizing the version to a modern release ensures consistent extension support
+          pandoc-version: '3.1.9' 
+      
+      # 4. Install Python dependencies (like 'rich')
+      - name: ⚙️ Install Python Dependencies
+        run: uv sync
+
+      # 5. Execute the build script
+      - name: 📦 Build Slides (Execute build.py)
+        run: uv run python build.py
+
+      # 6. Configure Deployment to GitHub Pages
+      - name: 🌐 Setup Pages
+        uses: actions/configure-pages@v5
+
+      # 7. Deploy the contents of the 'dist' folder
+      - name: 🚀 Upload Artifact and Deploy
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'dist' # The directory containing index.html
+
+      - name: 🚢 Finalize Deployment
+        id: deployment
+        uses: actions/deploy-pages@v4
