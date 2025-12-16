@@ -222,6 +222,20 @@ git commit -m "slides: update section on X"
 git push
 ```
 
+# Always rebuild before committing
+uv run python build.py
+
+# Add both slides and dist (since dist contains the build)
+git add slides/deck.md dist/
+
+# Commit
+git commit -m "slides: update content and rebuild"
+
+# Push (triggers GitHub Pages update)
+git push
+
+
+
 GitHub Pages Hosting
 GitHub Pages serves dist/
 CI can rebuild on every push to main
@@ -292,6 +306,17 @@ marp --serve
 Marp’s dev server renders Markdown directly, ignores `dist/`, and does not reflect
 GitHub Pages behavior. If it works in `dist/` but fails under `marp serve`,
 the server is the problem.
+
+
+## 🌐 Live Deployment
+
+Your slides are automatically deployed to GitHub Pages:
+
+**Live URL:** https://sidney-bishop.github.io/marp_slides_prj/
+
+Access this URL from any device to present your slides.
+
+
 
 
 
