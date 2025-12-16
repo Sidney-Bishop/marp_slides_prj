@@ -94,3 +94,5 @@ print(df)
 - **Source Control:** Git
 
 *This slide demonstrates automated deployment capabilities.*
+
+<!-- Force GitHub Pages update -->
