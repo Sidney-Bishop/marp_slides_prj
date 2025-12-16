@@ -78,3 +78,19 @@ print(df)
 
 *Cross-Industry Standard Process for Data Mining*
 ---
+---
+
+## 🚀 CI/CD Pipeline Test
+
+**GitHub Actions** successfully built and deployed these slides!
+
+**Workflow:** 🚀 Build and Deploy Slides  
+**Live URL:** https://sidney-bishop.github.io/marp_slides_prj/
+
+**Technology Stack:**
+- **Build:** Python + Marp
+- **CI/CD:** GitHub Actions
+- **Hosting:** GitHub Pages
+- **Source Control:** Git
+
+*This slide demonstrates automated deployment capabilities.*
