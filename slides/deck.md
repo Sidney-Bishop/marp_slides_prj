@@ -1,121 +1,80 @@
-# 💡 Project: Slides-as-Code
+---
+marp: true
+theme: default
+paginate: true
+title: "Machine Learning Strategy & Implementation"
+author: "Jason Roche"
+date: "December 2024"
+header: "CX Strategy | ML Implementation"
+footer: "Jason Roche · jasonanthonyroche@gmail.com"
+---
 
-### Markdown → Pandoc → Reveal.js
+<!-- _class: lead -->
+# **Machine Learning Strategy & Implementation**
 
-A minimal, fully reproducible build system.
+### A Practical Guide for Business Leaders
+
+Jason Roche  
+December 2024
 
 ---
 
-## 🗺️ Agenda
+## **About Me**
 
-* **Overview:** Philosophy and Goals
-* **Implementation:** Tools and Workflow
-* **Results:** Reproducibility and Hosting
+**Jason Roche**  
+*Senior Strategy Consultant*
 
----
+- 10+ years in data-driven strategy
+- Specializing in ML implementations for customer experience
+- Focus on practical, business-value driven approaches
+- Advocate for reproducible, ethical AI practices
 
-## 🎯 Overview: Philosophy
-
-The core principle is **Slides are Code**.
-
-* Markdown is the single, authoritative **source of truth**.
-* No proprietary binary files (e.g., PowerPoint).
-* The entire output (`dist/index.html`) is **deterministic and reproducible**.
-* Everything builds from a clean clone using a Python-governed process.
+**Contact:** jasonanthonyroche@gmail.com
 
 ---
 
-## 🛠️ Implementation: The Build Chain
+## **Today's Agenda**
 
-The process is orchestrated by a small, robust toolchain:
-
-![Screenshot of the successful build output](assets/test_image.jpg)
-
-<div style="text-align: center; font-size: 0.8em; color: #666;">
-*Successful build output showing 10KB file size*
-</div>
-
-1. **Source:** `slides/deck.md` (Markdown)
-2. **Orchestration:** `build.py` (Python + `uv` + `rich`)
-3. **Engine:** **Pandoc** (Markdown → HTML)
-4. **Vendor:** `revealjs/` (Presentation Assets)
-5. **Output:** `dist/index.html` (Final HTML Artifact)
+1. **The ML Opportunity** - Why now?
+2. **CRISP-DM Framework** - Structured approach  
+3. **Technical Implementation** - From data to deployment
+4. **Business Integration** - Making it work
+5. **Case Studies & Lessons Learned**
+6. **Next Steps & Resources**
 
 ---
 
-## 🚀 Results: Benefits
+## **The Machine Learning Landscape**
 
-### A fully automated, lightweight system:
+### Current State & Opportunities
 
-* **Local Review:** Instant builds using `uv run python build.py`.
-* **Hosting:** Zero-cost deployment via **GitHub Pages**.
-* **Maintenance:** Easy to update and collaborate with plain text files.
-* **CI-Ready:** Automatic rebuild and deploy on every commit via **GitHub Actions**.
+```python
+# Example: Simple ML opportunity assessment
+import pandas as pd
 
----
-
-# 📚 References & Further Reading
-
-* **Pandoc Documentation:** The universal document converter.
-* [https://pandoc.org](https://pandoc.org)
-
-* **Reveal.js Documentation:** HTML presentation framework.
-* [https://revealjs.com](https://revealjs.com)
-
-* **uv Documentation:** The fast Python package installer and resolver.
-* [https://astral.sh/uv](https://astral.sh/uv)
-
----
-
-# What's Next?
-
-### Automate the pipeline!
-
-Let's implement the **GitHub Actions Workflow** to deploy this deck live.
-
----
-
-# Questions?
-
-## Thank you! 🎉
-
-<style>
-.reveal .slides {
-    text-align: left;
+opportunities = {
+    "Customer Segmentation": "High Impact",
+    "Churn Prediction": "Medium Impact", 
+    "Recommendation Systems": "High Impact",
+    "Price Optimization": "Medium Impact",
+    "Fraud Detection": "Critical Impact"
 }
 
-.reveal h1 {
-    color: #e7ad52;
-    text-align: center;
-}
+df = pd.DataFrame.from_dict(opportunities, 
+                           orient='index', 
+                           columns=['Business Impact'])
+print(df)
+```
 
-.reveal h2 {
-    color: #e7ad52;
-    border-bottom: 2px solid #e7ad52;
-    padding-bottom: 10px;
-}
+---
+## **CRISP-DM: The Standard Methodology**
+ 
 
-.reveal img {
-    max-height: 300px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
+<img src="./assets/test_image.jpg"
+     alt="CRISP-DM Process Diagram"
+     width="10%"
+     style="display:block; margin: 0 auto;">
 
-.reveal .slide-number {
-    font-size: 12px;
-}
 
-.build-info {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    font-size: 0.6em;
-    color: #666;
-    font-family: monospace;
-}
-</style>
-
-<div class="build-info">
-Built: $build-time$ | Commit: $commit-hash$
-</div>
+*Cross-Industry Standard Process for Data Mining*
+---

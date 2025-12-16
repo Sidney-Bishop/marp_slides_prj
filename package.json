@@ -1,0 +1,12 @@
+{
+  "name": "cx-strategy-slides",
+  "version": "1.0.0",
+  "description": "Python-driven slides with Marp",
+  "scripts": {
+    "build": "marp slides/deck.md -o dist/index.html",
+    "serve": "marp slides --server"
+  },
+  "devDependencies": {
+    "@marp-team/marp-cli": "^3.4.0"
+  }
+}
