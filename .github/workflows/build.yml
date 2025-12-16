@@ -2,61 +2,78 @@
 
 name: 🚀 Build and Deploy Slides
 
-# This workflow runs whenever code is pushed to the 'main' branch
 on:
   push:
     branches:
       - main
-  # Allows you to manually trigger the workflow from the Actions tab
   workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Needed to push the built files back to the gh-pages branch
-      pages: write # Needed for GitHub Pages deployment
-      id-token: write # Needed for GitHub Pages deployment (OIDC)
+      contents: read
+      pages: write
+      id-token: write
 
     steps:
       # 1. Checkout the repository code
       - name: ⬇️ Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. Setup Python environment and uv
-      - name: 🐍 Setup Python and uv
+      # 2. Setup Node.js (for Marp/npx) - CRITICAL FOR MARP
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'  # LTS version
+
+      # 3. Setup Python environment
+      - name: 🐍 Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.12'  # Exact version from .python-version
 
-      - name: 🔨 Install uv
+      # 4. Install uv (simpler method for CI)
+      - name: 🔧 Install uv
         run: pip install uv
 
-      # 3. Setup Pandoc (Using a modern version for reliability)
-      - name: 📚 Install Pandoc (v3.1.9)
-        uses: r-lib/actions/setup-pandoc@v2
-        with:
-          # Standardizing the version to a modern release ensures consistent extension support
-          pandoc-version: '3.1.9' 
-      
-      # 4. Install Python dependencies (like 'rich')
-      - name: ⚙️ Install Python Dependencies
-        run: uv sync
+      # 5. Install Python dependencies
+      - name: 📦 Install Python Dependencies
+        run: |
+          uv sync
+          # Debug: show installed packages
+          uv pip list
 
-      # 5. Execute the build script
-      - name: 📦 Build Slides (Execute build.py)
-        run: uv run python build.py
+      # 6. Execute the build script with debugging
+      - name: 🛠️ Build Slides (Execute build.py)
+        run: |
+          echo "=== CI ENVIRONMENT DEBUG ==="
+          echo "Working directory: $(pwd)"
+          echo "Python version: $(python --version)"
+          echo "Node version: $(node --version)"
+          echo "npx path: $(which npx || echo 'npx not found')"
+          echo "Files in slides/: $(ls -la slides/)"
+          echo "============================"
+          
+          # Run the build - DO NOT use uv run, use python directly
+          python build.py
+          
+          echo "=== BUILD OUTPUT VERIFICATION ==="
+          echo "Contents of dist/:"
+          ls -la dist/
+          echo "============================"
 
-      # 6. Configure Deployment to GitHub Pages
+      # 7. Configure Deployment to GitHub Pages
       - name: 🌐 Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v3
 
-      # 7. Deploy the contents of the 'dist' folder
-      - name: 🚀 Upload Artifact and Deploy
-        uses: actions/upload-pages-artifact@v3
+      # 8. Upload the built slides
+      - name: 🚀 Upload Artifact
+        uses: actions/upload-pages-artifact@v2
         with:
-          path: 'dist' # The directory containing index.html
+          path: 'dist'
 
-      - name: 🚢 Finalize Deployment
+      # 9. Deploy to GitHub Pages
+      - name: 🚢 Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v2
