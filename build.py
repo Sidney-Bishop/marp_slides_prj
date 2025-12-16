@@ -48,7 +48,7 @@ def main():
         # Build with Marp (enable HTML and allow local files)
         # NOTE: --allow-local-files is added to fix image path issue
         logger.info("Building slides with Marp")
-        marp_cmd = ["npx", "marp", "--html", "--allow-local-files", "slides/deck.md", "-o", "dist/index.html"]
+        marp_cmd = ["npx", "@marp-team/marp-cli", "--html", "--allow-local-files", "slides/deck.md", "-o", "dist/index.html"]
         
         if not run_command(marp_cmd):
             return False
