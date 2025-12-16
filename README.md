@@ -18,30 +18,32 @@ Markdown · Marp · Python 3.12 · uv · CI-ready
 ---
 
 
+
 ## Repo Layout
 
 ```text
-CX_STRATEGY/
+marp_slides_prj/
 ├── .github/workflows/
-│   └── build.yml          # CI/CD pipeline
+│   └── build.yml          # CI/CD pipeline (GitHub Actions)
 ├── assets/                # Static assets (images, etc.)
 │   ├── CRISP-DM_Process_Diagram.png
 │   └── test_image.jpg
-├── dist/                  # Build output (GitHub Pages target)
-│   ├── assets/            # Copied from source assets/
-│   └── index.html         # Generated slides
 ├── slides/                # Source of truth
 │   └── deck.md           # Main slide content
 ├── .venv/                 # Python virtual environment (gitignored)
 ├── .python-version        # Python version specification
 ├── .gitignore            # Git ignore rules
 ├── build.py              # Python-controlled build script
-├── package.json          # Node.js dependencies (for Marp)
+├── package.json          # Node.js configuration
 ├── package-lock.json     # Node.js lock file
 ├── pyproject.toml        # Python project configuration
 ├── uv.lock               # Python dependency lock file
 └── README.md             # This file
 ```
+
+**Live Demo:** https://sidney-bishop.github.io/marp_slides_prj/
+
+
 
 
 ## ⚙️ Initial Setup: Prerequisite Checklist
@@ -56,11 +58,12 @@ Before you run `uv sync` to create the isolated environment, the project needs t
 | **`pyproject.toml`** | The standard configuration file for Python projects. It names the project, sets the version, and lists the required dependencies (`rich`). | `cat > pyproject.toml << 'EOF' ... EOF` |
 | **`slides/` Directory** | The folder that will hold the source-of-truth Markdown files (like `deck.md`). | `mkdir -p slides` |
 | **`deck.md` File** | A placeholder for the main content file, ensuring the build process has a target. | `touch slides/deck.md` |
-| **`dist/` Directory** | The folder where the final HTML build artifact (`index.html`) will be placed. | `mkdir -p dist` |
+| **`dist/` Directory** | Build output directory (gitignored). Created locally for testing, built fresh in CI for deployment. | `mkdir -p dist` |
+| **`package.json`** | Node.js configuration for Marp (created by npm). | `npm init -y` |
 
 
 ```bash
-# 1. Create the three required files and directories
+# 1. Create the required files and directories
 
 # Defines the Python version (3.12.5) for pyenv
 echo "3.12.5" > .python-version
@@ -78,46 +81,39 @@ dependencies = [
 ]
 EOF
 
-# Create the source and distribution directories
-mkdir -p slides dist
+# Initialize npm for Marp (optional - npx works without this)
+npm init -y
+
+# Create the source, assets, and distribution directories
+mkdir -p slides assets dist
 touch slides/deck.md
+
+# Note: 'dist/' is gitignored and built fresh in CI environment
 ```
+
 
 ## Step 2: Install Python and Verify Environment
 
 This step ensures the environment dependencies are handled before the Python environment is finalized.
 
 ```bash
+
 # 2a. Install Python 3.12.5 if you don't have it yet
-# (This is managed by 'pyenv' and is instant if the version is already installed)
 pyenv install --skip-existing 3.12.5
 
-# 2b. (Optional) Verify Node.js/npx availability
-# Marp runs via npx, which comes with Node.js
-node --version || echo "Note: Node.js not installed, but npx will download Marp on-demand"
+# 2b. Verify Node.js availability
+# Marp runs via npx and requires Node.js for consistent builds
+node --version || echo "Note: Node.js is required. Install from https://nodejs.org/"
+
+# Note: GitHub Actions automatically sets up both Python and Node.js in CI
 ```
-
-Step 3: Create the Environment and Install Dependencies
-
-This final step uses uv to install the packages defined in pyproject.toml into the isolated virtual environment (.venv/).
-
-```bash
-# 3. Create the perfect environment (~1 second)
-# uv reads pyproject.toml and installs all dependencies into .venv/
-uv sync
-```
-
-Next Steps
-
-With the environment created, you can now run the build using uv run python build.py as detailed in the Daily Workflow section.
-
 
 
 ---
 
 ### Why These Files Are Essential (The "Why")
 
-The project setup relies on a fundamental principle: **reproducibility**. Every file created in this step serves a specific role in ensuring that the slide system builds exactly the same way for every developer and on the CI server.
+The project setup relies on a fundamental principle: **reproducibility**. Every file serves a specific role in ensuring that the slide system builds exactly the same way for every developer and on the CI server.
 
 #### The Governance Files (`.python-version` & `pyproject.toml`)
 
@@ -125,6 +121,7 @@ These files define the environment. They act as the contract for the project.
 
 * **`.python-version`** tells the system **which** Python interpreter (`3.12.5`) to use.
 * **`pyproject.toml`** tells the dependency manager (`uv`) **what** packages to install inside the virtual environment.
+* **`package.json`** defines Node.js configuration for Marp (ensuring consistent builds across environments).
 
 Without these files, the environment cannot be built consistently.
 
@@ -133,9 +130,9 @@ Without these files, the environment cannot be built consistently.
 These are the two endpoints of our workflow:
 
 * **`slides/`**: This is the **input** folder. It is the only place where developers should ever edit files. The core rule is: **Markdown is the source of truth.**
-* **`dist/`**: This is the **output** folder. It's the destination for the final `index.html` built by Pandoc. We create it now so the build script never fails to find the target.
+* **`dist/`**: This is the **output** folder. It's where the final `index.html` is built by **Marp**. This directory is gitignored and built fresh in the CI environment, then automatically deployed to GitHub Pages.
 
-This structure separates the customizable source code (in `slides/`) from the automatically generated artifacts (in `dist/`).
+This structure separates the customizable source code (in `slides/`) from the automatically generated artifacts (in `dist/`), with GitHub Actions handling the build and deployment pipeline.
 
 ---
 
@@ -171,6 +168,9 @@ Writes output to dist/index.html
 Can inject version, date, commit hash, etc.
 PowerPoint never enters the pipeline.
 
+**Note:** The build also runs automatically via GitHub Actions on every `git push`, 
+deploying your slides to https://sidney-bishop.github.io/marp_slides_prj/
+
 
 
 
@@ -203,37 +203,28 @@ dist/
 | **Never edit `dist/` manually** | Always rebuilt |
 | **Always commit `uv.lock`** | Reproducibility |
 | **Never commit `.venv/`** | Recreated instantly |
+| **Always commit `package-lock.json`** | Pins exact Marp/npm versions for reproducibility |
 
-Daily Workflow
+
+
+
+
+## Daily Workflow
 
 ```bash
-# Edit slides
+# 1. Edit your slides
 vim slides/deck.md
 
-# Build
+# 2. (Optional) Build locally to preview
 uv run python build.py
+npx serve dist  # or: open dist/index.html
 
-# Review locally
-open dist/index.html
+# 3. Commit source changes only
+git add slides/deck.md
+git commit -m "slides: update [section/topic]"
 
-# Commit
-git add slides build.py pyproject.toml uv.lock
-git commit -m "slides: update section on X"
+# 4. Push to trigger automated deployment
 git push
-```
-
-# Always rebuild before committing
-uv run python build.py
-
-# Add both slides and dist (since dist contains the build)
-git add slides/deck.md dist/
-
-# Commit
-git commit -m "slides: update content and rebuild"
-
-# Push (triggers GitHub Pages update)
-git push
-
 
 
 GitHub Pages Hosting
@@ -245,36 +236,29 @@ URL:
 https://<username>.github.io/<repo>
 ```
 
-No servers. No runtime dependencies.
 
-Golden Rules
-Markdown only
-Python controls everything
-Builds must succeed from a clean clone
-If it’s not reproducible, it’s a bug
+## Golden Rules
 
-```markdown
-TL;DR
+- **Markdown only** - Source of truth
+- **Python controls everything** - Build automation
+- **Builds must succeed from a clean clone** - Reproducibility
+- **If it's not reproducible, it's a bug** - Quality guarantee
+
+## TL;DR
 
 ```bash
+# Setup once
 uv sync
-edit slides/*.md
-uv run python build.py
-git commit
-git push
+
+# Daily workflow
+edit slides/deck.md
+git add slides/deck.md
+git commit -m "update slides"
+git push  # ← Triggers GitHub Actions auto-deploy!
 ```
 
-Slides as code nothing else:
 
-```yaml
 
-If you want next:
-- the **exact `build.py`**
-- a **Pandoc command line pinned properly**
-- or a **GitHub Actions workflow**
-
-say which one.
-```
 
 
 ## 🔍 Local Preview (GitHub Pages–Accurate)
@@ -310,11 +294,13 @@ the server is the problem.
 
 ## 🌐 Live Deployment
 
-Your slides are automatically deployed to GitHub Pages:
+Your slides are automatically built and deployed via **GitHub Actions**:
+
+[![GitHub Pages Deployment](https://github.com/Sidney-Bishop/marp_slides_prj/actions/workflows/build.yml/badge.svg)](https://github.com/Sidney-Bishop/marp_slides_prj/actions/workflows/build.yml)
 
 **Live URL:** https://sidney-bishop.github.io/marp_slides_prj/
 
-Access this URL from any device to present your slides.
+Access this URL from any device to present your slides. Updates automatically within 2 minutes of pushing changes.
 
 
 
