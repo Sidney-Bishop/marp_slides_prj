@@ -1,7 +1,11 @@
-# Python / uv
+# Python
 .venv/
-uv.lock.tmp
 __pycache__/
+*.pyc
+
+# Node
+node_modules/
+npm-debug.log*
 
 # Build artifacts
 dist/
@@ -9,5 +13,5 @@ dist/
 # macOS
 .DS_Store
 
-# VS Code
-.vscode/
+# Environment files
+.env

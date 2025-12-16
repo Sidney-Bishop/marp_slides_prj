@@ -1,9 +1,9 @@
-# Slides Project (Markdown → reveal.js)
+# Slides Project (Markdown → HTML via Marp)
 
 A minimal, fully reproducible slide system with **Markdown as source of truth**,  
 **Python-governed builds**, and **GitHub Pages hosting**.
 
-Markdown · Pandoc · reveal.js · Python 3.12 · uv · CI-ready
+Markdown · Marp · Python 3.12 · uv · CI-ready
 
 ---
 
@@ -17,26 +17,31 @@ Markdown · Pandoc · reveal.js · Python 3.12 · uv · CI-ready
 
 ---
 
+
 ## Repo Layout
 
-
-
 ```text
-slides_project/
-├── slides/
-│ └── deck.md # source of truth
-├── revealjs/ # vendored reveal.js (or submodule)
-├── dist/
-│ └── index.html # build artifact (GitHub Pages target)
-├── build.py # Python-controlled build
-├── pyproject.toml
-├── uv.lock
-├── .python-version
-├── .gitignore
-└── README.md
+CX_STRATEGY/
+├── .github/workflows/
+│   └── build.yml          # CI/CD pipeline
+├── assets/                # Static assets (images, etc.)
+│   ├── CRISP-DM_Process_Diagram.png
+│   └── test_image.jpg
+├── dist/                  # Build output (GitHub Pages target)
+│   ├── assets/            # Copied from source assets/
+│   └── index.html         # Generated slides
+├── slides/                # Source of truth
+│   └── deck.md           # Main slide content
+├── .venv/                 # Python virtual environment (gitignored)
+├── .python-version        # Python version specification
+├── .gitignore            # Git ignore rules
+├── build.py              # Python-controlled build script
+├── package.json          # Node.js dependencies (for Marp)
+├── package-lock.json     # Node.js lock file
+├── pyproject.toml        # Python project configuration
+├── uv.lock               # Python dependency lock file
+└── README.md             # This file
 ```
-
----
 
 
 ## ⚙️ Initial Setup: Prerequisite Checklist
@@ -78,7 +83,7 @@ mkdir -p slides dist
 touch slides/deck.md
 ```
 
-Step 2: Install Python and Vendor reveal.js
+## Step 2: Install Python and Verify Environment
 
 This step ensures the environment dependencies are handled before the Python environment is finalized.
 
@@ -87,8 +92,9 @@ This step ensures the environment dependencies are handled before the Python env
 # (This is managed by 'pyenv' and is instant if the version is already installed)
 pyenv install --skip-existing 3.12.5
 
-# 2b. Vendor the reveal.js assets (required by Pandoc)
-git clone https://github.com/hakimel/reveal.js revealjs
+# 2b. (Optional) Verify Node.js/npx availability
+# Marp runs via npx, which comes with Node.js
+node --version || echo "Note: Node.js not installed, but npx will download Marp on-demand"
 ```
 
 Step 3: Create the Environment and Install Dependencies
@@ -159,30 +165,25 @@ uv run python build.py
 ```
 
 What the build does:
-Calls Pandoc
-Uses reveal.js as the renderer
+Calls Marp (Markdown Presentation Ecosystem)
+Generates reveal.js-compatible HTML slides
 Writes output to dist/index.html
 Can inject version, date, commit hash, etc.
 PowerPoint never enters the pipeline.
 
 
-One-Time reveal.js Setup
-Either vendor reveal.js:
 
-```bash
-git clone https://github.com/hakimel/reveal.js revealjs
-```
-
-Or add it as a Git submodule.
-After that, never touch it manually.
 
 Perfect .gitignore
 ```gitignore
-# Python / uv
+# Python
 .venv/
-uv.lock.tmp
 __pycache__/
-*.py[cod]
+*.pyc
+
+# Node
+node_modules/
+npm-debug.log*
 
 # Build artifacts
 dist/
@@ -190,11 +191,9 @@ dist/
 # macOS
 .DS_Store
 
-# VS Code
-.vscode/
+# Environment files
+.env
 
-# Pandoc temp files
-*.log
 ```
 
 
@@ -262,6 +261,39 @@ If you want next:
 
 say which one.
 ```
+
+
+## 🔍 Local Preview (GitHub Pages–Accurate)
+
+This project does **not** use a live development server.
+
+GitHub Pages serves **static files only**, so local preview must do the same.
+
+### Correct local preview
+
+After building:
+
+npx serve dist
+
+or:
+
+python -m http.server --directory dist 8000
+
+Then open:
+
+http://localhost:8000
+
+This is byte-for-byte equivalent to GitHub Pages.
+
+### Do NOT use Marp’s dev server
+
+marp --serve
+
+Marp’s dev server renders Markdown directly, ignores `dist/`, and does not reflect
+GitHub Pages behavior. If it works in `dist/` but fails under `marp serve`,
+the server is the problem.
+
+
 
 
 
